@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Library.Models;
 using Library.Data;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 public class BooksController : Controller
 {
@@ -16,7 +17,7 @@ public class BooksController : Controller
     // GET: BOOKS
     public async Task<IActionResult> Index()    
     {
-        var Lijst = _context.Books.Where(a => a.isDeleted > DateTime.Now).OrderBy(a => a.Titel);
+        var Lijst = _context.Books.Include(b => b.Author).Where(a => a.isDeleted > DateTime.Now).OrderBy(a => a.Titel);
 
         return View(await Lijst.ToListAsync());
     }
@@ -42,6 +43,7 @@ public class BooksController : Controller
     // GET: BOOKS/Create
     public IActionResult Create()
     {
+        ViewData["Authors"] = new SelectList(_context.Authors.Where(a => a.isDeleted > DateTime.Now), "Id", "Achternaam");
         return View();
     }
 
@@ -58,6 +60,7 @@ public class BooksController : Controller
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+        ViewData["Authors"] = new SelectList(_context.Authors.Where(a => a.isDeleted > DateTime.Now), "Id", "Achternaam");
         return View(book);
     }
 
@@ -74,6 +77,9 @@ public class BooksController : Controller
         {
             return NotFound();
         }
+
+        var Authors = _context.Authors.Where(a => a.isDeleted > DateTime.Now).ToList();
+        ViewData["Authors"] = new SelectList(Authors, "Id", "Achternaam", book.AuthorId);
         return View(book);
     }
 
@@ -109,6 +115,9 @@ public class BooksController : Controller
             }
             return RedirectToAction(nameof(Index));
         }
+
+        var Authors = _context.Authors.Where(a => a.isDeleted > DateTime.Now).ToList();
+        ViewData["Authors"] = new SelectList(Authors, "Id", "Achternaam", book.AuthorId);
         return View(book);
     }
 
