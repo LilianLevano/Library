@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Library.Models;
 using Library.Data;
+using Microsoft.AspNetCore.Authorization;
 
+[Authorize]
 public class AuthorsController : Controller
 {
     private readonly LibraryDbContext _context;
@@ -14,6 +16,7 @@ public class AuthorsController : Controller
     }
 
     // GET: AUTHORS
+    [AllowAnonymous]
     public async Task<IActionResult> Index()    
     {
         var Lijst = _context.Authors.Where(a => a.isDeleted > DateTime.Now).OrderBy(a => a.Achternaam).ThenBy(a => a.Voornaam);

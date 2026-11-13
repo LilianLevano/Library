@@ -4,7 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Library.Models;
 using Library.Data;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
 
+[Authorize]
 public class BooksController : Controller
 {
     private readonly LibraryDbContext _context;
@@ -15,6 +17,7 @@ public class BooksController : Controller
     }
 
     // GET: BOOKS
+    [AllowAnonymous]
     public async Task<IActionResult> Index()    
     {
         var Lijst = _context.Books.Include(b => b.Author).Where(a => a.isDeleted > DateTime.Now).OrderBy(a => a.Titel);
@@ -23,6 +26,7 @@ public class BooksController : Controller
     }
 
     // GET: BOOKS/Details/5
+    [AllowAnonymous]
     public async Task<IActionResult> Details(int? id)
     {
         if (id == null)
