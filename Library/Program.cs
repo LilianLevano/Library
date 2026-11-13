@@ -2,6 +2,7 @@ using Library.Data;
 using Library.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,12 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
     
 
 builder.Services.AddControllersWithViews();
+
+// API controllers toevoegen
+builder.Services.AddControllers();
+
+// Swagger API testing toevoegen
+builder.Services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "Library API", Version = "v1" }); });
 
 var app = builder.Build();
 
@@ -46,10 +53,20 @@ app.UseAuthorization();
 
 app.MapStaticAssets();
 
+// Gebruik Swagger in de requestafhandeling
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Library API v1"));
+}
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
+
+// Definieer API endpoints
+app.UseEndpoints(e => { e.MapControllers(); });
 
 app.MapRazorPages()
    .WithStaticAssets();
